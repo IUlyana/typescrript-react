@@ -8,7 +8,7 @@ const Registration: React.FC<RegistrationProps> = ({ value, updateText, handleAc
   return (
     <label>
       <input
-        placeholder='lisence'
+        placeholder='ключ регистрации'
         value={value}
         onChange={(e) => updateText(e.target.value)}
       />

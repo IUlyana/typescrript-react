@@ -1,7 +1,7 @@
 const productVer = "7";
 const productID_max_win = "MAXA0777-mA7A-a257-x53A-m2678A19185x";
 
-export function generateSerial(id1:string, id2:string) {
+export function generateSerial(id1:string, id2:string):string {
     const product:string = productVer + '-' + productID_max_win;
     const idParam1:string = id1;
     const idParam2:string = id2;

@@ -1,55 +1,71 @@
-import { createSlice, createAsyncThunk, PayloadAction, AnyAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-type Auth = string;
 type Answer = {
-  auth:string;
-  error: string|null;
+  keyUser:string;
+  keyGenerate:string;
+  error:string|undefined;
+  isPortable: any;
 }
 
+const initialState:Answer ={
+  keyUser: '',
+  error: undefined,
+  keyGenerate: '',
+  isPortable: undefined
+}
 
-
-export const addAuth = createAsyncThunk<Auth, string, { rejectValue: string }>(
-  'auth/addAuth',
-  async function (text, { rejectWithValue }) {
-      const lisence = {lisence: text}
-      const response = await fetch('http://localhost:4000/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(lisence)
-      });
-
-      if (response.status >= 400) {
-        return rejectWithValue('Не удалось зарегестрироваться.Ошибка сервера');
+export const checkKey = createAsyncThunk(
+  'auth/checkKey',
+  (key:string[]) => {
+    if(key[0] && key[1]){
+      for (let i = 0; i < key[0].length; i++)
+      {
+          if (key[0][i] !== key[1][i]) {
+              console.log('не найдено совпадение: ' + i);
+              return false
+          } 
+          if(key[0][i] === key[1][i]) {
+            return true 
+          } 
       }
-
-      return (await response.json()) as Auth;
+}
   }
 );
-const initialState: Answer= {
-  auth: '',
-  error: null
-};
+
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    keyClients: (state, action: PayloadAction<string>) => {
+      state.keyUser = action.payload;
+
+      if(state.keyUser.length < 29) {
+        state.error = 'Введенный ключ слишком короткий'
+      }
+    
+      if(state.keyUser.length === 0 || state.keyUser === null){
+        state.error = 'Введите ключ лицензии'
+      };
+    },
+    keyСreated: (state, action: PayloadAction<string>) => {
+      state.keyGenerate = action.payload;
+      console.log(state.keyGenerate);
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(addAuth.fulfilled, (state, action) => {
-        state.auth = action.payload;        
+      .addCase(checkKey.fulfilled, (state, action) => {
+        state.isPortable = action.payload;   
+        if(state.isPortable === false) {
+          state.error = 'Ключ лицензии неверный. Поробуйте еще раз.'
+        }
       })
-      .addMatcher(isError, (state, action: PayloadAction<string>) => {
-        state.error = action.payload;             
-      });
+
+
   }
 });
 
-
+export const { keyClients, keyСreated} = authSlice.actions;
 export default authSlice.reducer;
 
-function isError(action: AnyAction) {
-  return action.type.endsWith('rejected');
-}

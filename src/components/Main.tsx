@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { addAuth } from '../authSlice';
+import React, {  useState } from 'react';
+import { checkKey, keyClients, keyСreated } from '../authSlice';
 import { addKey } from '../checkKey';
 import { useAppDispatch, useAppSelector } from '../hook';
 import { generateSerial } from '../renderLisence';
@@ -9,30 +9,32 @@ const ipcRenderer  = electron.ipcRenderer;
 
 
 function Main() {
-  const [text, setText] = useState('')
-  const { error } = useAppSelector(state => state.auth);
+  const [keyClient, setText] = useState('');
+  const state= useAppSelector(state => state.auth);
+  console.log(state.isPortable);
+  
   const dispatch = useAppDispatch();
-  const handleAction = () => {
-    if (text.trim().length) {
-      dispatch(addAuth(text));
-      setText('');
-    }
-  }
-
   const recognizedDevices:string = ipcRenderer.sendSync('hhdid');
   const key:string = ipcRenderer.sendSync('idProcess');
   const numLicense = generateSerial(recognizedDevices, key);
-  const numKey = addKey(numLicense);
-  console.log(numKey);
+  const generateKey:string = addKey(numLicense);
+  const checkArr:string[] = [generateKey, keyClient]
   
+  const handleAction = () => {
+      dispatch(keyСreated(generateKey));
+      dispatch(keyClients(keyClient));
+      dispatch(checkKey(checkArr));   
+      setText('');
+  }
+
   return (
     <div>
       <p>Номер лицензии: {numLicense}</p>
       <Registration
-      value={text}
+      value={keyClient}
       updateText={setText}
       handleAction={handleAction}/>
-      {error && <p>{error}</p>}
+      {state.error && <p>{state.error}</p>}
     </div>
   );
 }
