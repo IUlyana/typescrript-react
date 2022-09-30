@@ -11,7 +11,6 @@ const ipcRenderer  = electron.ipcRenderer;
 function Main() {
   const [keyClient, setText] = useState('');
   const state= useAppSelector(state => state.auth);
-  console.log(state.isPortable);
   
   const dispatch = useAppDispatch();
   const recognizedDevices:string = ipcRenderer.sendSync('hhdid');

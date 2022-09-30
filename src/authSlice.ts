@@ -21,7 +21,6 @@ export const checkKey = createAsyncThunk(
       for (let i = 0; i < key[0].length; i++)
       {
           if (key[0][i] !== key[1][i]) {
-              console.log('не найдено совпадение: ' + i);
               return false
           } 
           if(key[0][i] === key[1][i]) {
@@ -40,7 +39,7 @@ const authSlice = createSlice({
     keyClients: (state, action: PayloadAction<string>) => {
       state.keyUser = action.payload;
 
-      if(state.keyUser.length < 29) {
+      if(state.keyUser.length < 41) {
         state.error = 'Введенный ключ слишком короткий'
       }
     
@@ -50,7 +49,6 @@ const authSlice = createSlice({
     },
     keyСreated: (state, action: PayloadAction<string>) => {
       state.keyGenerate = action.payload;
-      console.log(state.keyGenerate);
     },
   },
   extraReducers: (builder) => {
